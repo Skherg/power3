@@ -14,13 +14,11 @@ DROP POLICY IF EXISTS "users_insert_allow_all" ON users;
 DROP POLICY IF EXISTS "users_select_public" ON users;
 DROP POLICY IF EXISTS "users_update_authenticated" ON users;
 DROP POLICY IF EXISTS "users_all_public" ON users;
-
 -- Create working user policies
 CREATE POLICY "users_all_public" ON users
     FOR ALL 
     USING (true)
     WITH CHECK (true);
-
 -- ============================================================================
 -- ASSESSMENTS TABLE  
 -- ============================================================================
@@ -34,13 +32,11 @@ DROP POLICY IF EXISTS "assessments_select_own_authenticated" ON assessments;
 DROP POLICY IF EXISTS "assessments_select_public_by_id" ON assessments;
 DROP POLICY IF EXISTS "assessments_update_authenticated" ON assessments;
 DROP POLICY IF EXISTS "assessments_all_public" ON assessments;
-
 -- Create working assessment policies
 CREATE POLICY "assessments_all_public" ON assessments
     FOR ALL 
     USING (true)
     WITH CHECK (true);
-
 -- ============================================================================
 -- GRANTS
 -- ============================================================================
@@ -53,10 +49,8 @@ GRANT ALL ON settings TO anon, authenticated;
 GRANT ALL ON profiles TO anon, authenticated;
 GRANT ALL ON questions TO anon, authenticated;
 GRANT ALL ON admin_users TO authenticated;
-
 -- Grant sequence permissions
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
-
 -- ============================================================================
 -- INDEXES
 -- ============================================================================

@@ -462,9 +462,11 @@ export async function generateTestLink(
 
     console.log('Inserting test link with data:', insertData)
 
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('test_links')
         .insert(insertData)
+        .select()
+        .single()
 
     if (error) {
         console.error('Error generating test link:', error)
@@ -676,9 +678,10 @@ export async function generateBatchTestLinks(
     // Insert all links in one batch
     console.log('Inserting batch test links with data:', linksToInsert)
 
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('test_links')
         .insert(linksToInsert)
+        .select()
 
     if (error) {
         console.error('Error generating batch test links:', error)

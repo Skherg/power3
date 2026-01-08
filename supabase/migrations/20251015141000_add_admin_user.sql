@@ -9,7 +9,6 @@ VALUES (
     (SELECT email FROM auth.users WHERE id = '1b07ded5-3c0f-4dde-9232-7f754150ccd0'::uuid),
     true
 ) ON CONFLICT (user_id) DO NOTHING;
-
 -- If you need to add more admin users, you can add them here:
 -- INSERT INTO admin_users (user_id, email, is_active) 
 -- VALUES (

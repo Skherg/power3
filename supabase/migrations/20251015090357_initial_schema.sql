@@ -8,7 +8,6 @@ CREATE TABLE users (
     leadership_experience INT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Create the assessments table
 CREATE TABLE assessments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -22,7 +21,6 @@ CREATE TABLE assessments (
     personality_type TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Create the test_links table
 CREATE TABLE test_links (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -31,14 +29,12 @@ CREATE TABLE test_links (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     used_at TIMESTAMPTZ
 );
-
 -- Create the settings table
 CREATE TABLE settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key TEXT UNIQUE NOT NULL,
     value BOOLEAN
 );
-
 -- Create the profiles table
 CREATE TABLE profiles (
     code TEXT PRIMARY KEY,
@@ -52,7 +48,6 @@ CREATE TABLE profiles (
     development_areas TEXT[],
     pitfalls TEXT[]
 );
-
 -- Create the questions table
 CREATE TABLE questions (
     id TEXT PRIMARY KEY,

@@ -7,19 +7,15 @@ CREATE TABLE admin_users (
     created_by UUID REFERENCES auth.users(id),
     is_active BOOLEAN DEFAULT TRUE
 );
-
 -- Enable RLS on admin_users table
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
-
 -- Create policies for admin_users table
 -- Only authenticated users can read admin_users (for checking admin status)
 CREATE POLICY "Authenticated users can read admin_users" ON admin_users
     FOR SELECT USING (auth.role() = 'authenticated');
-
 -- Only service role can manage admin users
 CREATE POLICY "Service role can manage admin_users" ON admin_users
     FOR ALL USING (auth.role() = 'service_role');
-
 -- Create a function to create the first admin user
 CREATE OR REPLACE FUNCTION create_first_admin(admin_email TEXT, admin_password TEXT)
 RETURNS TEXT AS $$
@@ -39,10 +35,8 @@ BEGIN
     RETURN 'Please create admin users through Supabase Auth dashboard and then add them to admin_users table.';
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
 -- Create indexes for better performance
 CREATE INDEX idx_admin_users_user_id ON admin_users(user_id);
 CREATE INDEX idx_admin_users_email ON admin_users(email);
-
 -- Add unique constraint to prevent duplicate admin entries
 ALTER TABLE admin_users ADD CONSTRAINT unique_admin_user_id UNIQUE (user_id);

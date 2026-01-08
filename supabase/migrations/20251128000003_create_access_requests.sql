@@ -11,26 +11,21 @@ CREATE TABLE access_requests (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     reviewed_at TIMESTAMPTZ,
     reviewed_by UUID REFERENCES auth.users(id),
-    generated_link_id UUID REFERENCES test_links(id) ON DELETE SET NULL
+    generated_link_id UUID REFERENCES test_links(id)
 );
-
 -- Add comment
 COMMENT ON TABLE access_requests IS 'Stores user requests for test access';
-
 -- Add indexes
 CREATE INDEX IF NOT EXISTS idx_access_requests_status ON access_requests(status);
 CREATE INDEX IF NOT EXISTS idx_access_requests_created_at ON access_requests(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_access_requests_email ON access_requests(email);
-
 -- Enable RLS
 ALTER TABLE access_requests ENABLE ROW LEVEL SECURITY;
-
 -- Allow anyone to insert access requests
 CREATE POLICY "access_requests_insert_public" ON access_requests
     FOR INSERT 
     TO anon, authenticated
     WITH CHECK (true);
-
 -- Allow admins to view all access requests
 CREATE POLICY "access_requests_select_admin" ON access_requests
     FOR SELECT 
@@ -42,7 +37,6 @@ CREATE POLICY "access_requests_select_admin" ON access_requests
             AND admin_users.is_active = true
         )
     );
-
 -- Allow admins to update access requests
 CREATE POLICY "access_requests_update_admin" ON access_requests
     FOR UPDATE 
@@ -54,7 +48,6 @@ CREATE POLICY "access_requests_update_admin" ON access_requests
             AND admin_users.is_active = true
         )
     );
-
 -- Grant permissions
 GRANT INSERT ON access_requests TO anon, authenticated;
 GRANT SELECT, UPDATE ON access_requests TO authenticated;
