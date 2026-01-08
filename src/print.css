@@ -1,0 +1,60 @@
+@media print {
+  body {
+    background-color: #fff;
+    color: #000;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  @page {
+    margin: 0.5in;
+    size: A4;
+  }
+
+  .printable-content {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+  }
+
+  .printable-card {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    border: 1px solid #ddd;
+    break-inside: avoid;
+    background: white !important;
+    margin-bottom: 1rem;
+  }
+
+  .bg-gradient-to-br {
+    background-image: none !important;
+    background: white !important;
+  }
+
+  /* Ensure text is readable in print */
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Make sure gradients show as solid colors in print */
+  [style*="background: linear-gradient"] {
+    background: #333 !important;
+    color: white !important;
+  }
+
+  /* Improve spacing for print */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  /* Ensure proper page breaks */
+  .grid {
+    page-break-inside: avoid;
+  }
+}
