@@ -124,7 +124,7 @@ CREATE TABLE access_requests (
     created_at TIMESTAMPTZ DEFAULT now(),
     reviewed_at TIMESTAMPTZ,
     reviewed_by UUID REFERENCES auth.users(id),
-    generated_link_id UUID REFERENCES test_links(id)
+    generated_link_id UUID REFERENCES test_links(id) ON DELETE SET NULL
 );
 
 -- ============================================
