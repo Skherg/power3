@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Eye, Users, Target, ArrowRight } from '@phosphor-icons/react';
+import { supabase } from '../lib/supabase';
 
 interface WelcomePageProps {
   onStart: () => void;
@@ -17,6 +18,13 @@ const palette = {
 };
 
 export const WelcomePage: React.FC<WelcomePageProps> = ({ onStart, testType }) => {
+  // Simple background query to keep Supabase active
+  useEffect(() => {
+    supabase.from('settings').select('count', { count: 'exact', head: true }).then(() => {
+      // Silent query - users never see this
+    });
+  }, []);
+
   return (
     // A more subtle background gradient that hints at the new palette
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-teal-50 to-green-50 flex items-center justify-center p-4">
