@@ -21,6 +21,8 @@ interface QuestionPageProps {
   onNext: () => void;
   onPrevious: () => void;
   onFinish: () => void;
+  isSubmitting?: boolean;
+  finishButtonText?: string;
 }
 
 export const QuestionPage: React.FC<QuestionPageProps> = ({
@@ -31,7 +33,9 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   onAnswer,
   onNext,
   onPrevious,
-  onFinish
+  onFinish,
+  isSubmitting = false,
+  finishButtonText = 'შედეგების ნახვა'
 }) => {
   const currentResponse = responses.find(r => r.questionId === question.id);
   const [selectedScore, setSelectedScore] = useState<number | null>(null);
@@ -202,14 +206,23 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
               {currentIndex === totalQuestions - 1 ? (
                 <button
                   onClick={onFinish}
-                  disabled={selectedScore === null}
-                  className={`inline-flex items-center justify-center px-8 py-3 font-semibold rounded-full transition-all duration-300 w-full ${selectedScore !== null
+                  disabled={selectedScore === null || isSubmitting}
+                  className={`inline-flex items-center justify-center px-8 py-3 font-semibold rounded-full transition-all duration-300 w-full ${selectedScore !== null && !isSubmitting
                     ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-white hover:shadow-lg transform hover:scale-105'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                 >
-                  შედეგების ნახვა
-                  <ArrowRight size={20} className="ml-2 w-5 h-5" />
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                      იგზავნება...
+                    </>
+                  ) : (
+                    <>
+                      {finishButtonText}
+                      <ArrowRight size={20} className="ml-2 w-5 h-5" />
+                    </>
+                  )}
                 </button>
               ) : (
                 <button
@@ -255,14 +268,23 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
               {currentIndex === totalQuestions - 1 ? (
                 <button
                   onClick={onFinish}
-                  disabled={selectedScore === null}
-                  className={`inline-flex items-center justify-center px-8 py-3 font-semibold rounded-full transition-all duration-300 ${selectedScore !== null
+                  disabled={selectedScore === null || isSubmitting}
+                  className={`inline-flex items-center justify-center px-8 py-3 font-semibold rounded-full transition-all duration-300 ${selectedScore !== null && !isSubmitting
                     ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-white hover:shadow-lg transform hover:scale-105'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                 >
-                  შედეგების ნახვა
-                  <ArrowRight size={20} className="ml-2 w-5 h-5" />
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                      იგზავნება...
+                    </>
+                  ) : (
+                    <>
+                      {finishButtonText}
+                      <ArrowRight size={20} className="ml-2 w-5 h-5" />
+                    </>
+                  )}
                 </button>
               ) : (
                 <button

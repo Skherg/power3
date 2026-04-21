@@ -35,6 +35,7 @@ export default function TestTaker({ linkCode }: TestTakerProps) {
     gender: '',
     leadership_experience: ''
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     initializeTest()
@@ -86,64 +87,74 @@ export default function TestTaker({ linkCode }: TestTakerProps) {
   const handlePersonalInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validate required fields
-    if (!personalInfo.first_name.trim() || !personalInfo.last_name.trim() || !personalInfo.age.trim() || !personalInfo.gender.trim() || !personalInfo.leadership_experience.trim()) {
-      setError('ყველა ველი აუცილებელია შესავსებად')
-      return
-    }
+    setIsSubmitting(true);
 
-    // Validate age
-    const age = parseInt(personalInfo.age)
-    if (isNaN(age) || age < 18 || age > 100) {
-      setError('ასაკი უნდა იყოს 18-დან 100 წლამდე')
-      return
-    }
+    try {
+      // Validate required fields
+      if (!personalInfo.first_name.trim() || !personalInfo.last_name.trim() || !personalInfo.age.trim() || !personalInfo.gender.trim() || !personalInfo.leadership_experience.trim()) {
+        setError('ყველა ველი აუცილებელია შესავსებად')
+        return
+      }
 
-    // Validate leadership experience
-    const experience = parseInt(personalInfo.leadership_experience)
-    if (isNaN(experience) || experience < 0 || experience > 50) {
-      setError('ლიდერობის გამოცდილება უნდა იყოს 0-დან 50 წლამდე')
-      return
-    }
+      // Validate age
+      const age = parseInt(personalInfo.age)
+      if (isNaN(age) || age < 18 || age > 100) {
+        setError('ასაკი უნდა იყოს 18-დან 100 წლამდე')
+        return
+      }
 
-    const userData = {
-      first_name: personalInfo.first_name.trim(),
-      last_name: personalInfo.last_name.trim(),
-      age,
-      gender: personalInfo.gender,
-      leadership_experience: experience
-    }
+      // Validate leadership experience
+      const experience = parseInt(personalInfo.leadership_experience)
+      if (isNaN(experience) || experience < 0 || experience > 50) {
+        setError('ლიდერობის გამოცდილება უნდა იყოს 0-დან 50 წლამდე')
+        return
+      }
 
-    const newUser = await createUser(userData)
-    if (!newUser) {
-      setError('Failed to create user')
-      setStep('error')
-      return
-    }
+      const userData = {
+        first_name: personalInfo.first_name.trim(),
+        last_name: personalInfo.last_name.trim(),
+        age,
+        gender: personalInfo.gender,
+        leadership_experience: experience
+      }
 
-    setUser(newUser)
-
-    if (allowResultsDisplay) {
-      // For results link: personal info collected after questions, now submit and show results
-      const newAssessment = await submitAssessmentWithSelfAssessment(newUser, answers, selfAssessment)
-      if (!newAssessment) {
-        setError('Failed to submit assessment')
+      const newUser = await createUser(userData)
+      if (!newUser) {
+        setError('Failed to create user')
         setStep('error')
         return
       }
 
-      // Mark link as used if it's a single-use link
-      const { validateTestLink, markTestLinkAsUsed } = await import('../lib/api')
-      const testLink = await validateTestLink(linkCode)
-      if (testLink?.single_use) {
-        await markTestLinkAsUsed(linkCode)
-      }
+      setUser(newUser)
 
-      // Redirect to persistent results page
-      window.location.href = `/results/${newAssessment.id}`
-    } else {
-      // For no-results link: personal info collected first, now start questions
-      setStep('questions')
+      if (allowResultsDisplay) {
+        // For results link: personal info collected after questions, now submit and show results
+        const newAssessment = await submitAssessmentWithSelfAssessment(newUser, answers, selfAssessment)
+        if (!newAssessment) {
+          setError('Failed to submit assessment')
+          setStep('error')
+          return
+        }
+
+        // Mark link as used if it's a single-use link
+        const { validateTestLink, markTestLinkAsUsed } = await import('../lib/api')
+        const testLink = await validateTestLink(linkCode)
+        if (testLink?.single_use) {
+          await markTestLinkAsUsed(linkCode)
+        }
+
+        // Redirect to persistent results page
+        window.location.href = `/results/${newAssessment.id}`
+      } else {
+        // For no-results link: personal info collected first, now start questions
+        setStep('questions')
+      }
+    } catch (err) {
+      console.error('Error submitting personal info:', err)
+      setError('შეცდომა მონაცემების გაგზავნისას')
+      setStep('error')
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -173,23 +184,33 @@ export default function TestTaker({ linkCode }: TestTakerProps) {
       // For no-results link: user info already collected, submit assessment
       if (!user) return
 
-      const newAssessment = await submitAssessmentWithSelfAssessment(user, answers, selfAssessment)
-      if (!newAssessment) {
-        setError('Failed to submit assessment')
+      setIsSubmitting(true);
+
+      try {
+        const newAssessment = await submitAssessmentWithSelfAssessment(user, answers, selfAssessment)
+        if (!newAssessment) {
+          setError('Failed to submit assessment')
+          setStep('error')
+          return
+        }
+
+        // Mark link as used if it's a single-use link
+        const { validateTestLink, markTestLinkAsUsed } = await import('../lib/api')
+        const testLink = await validateTestLink(linkCode)
+        if (testLink?.single_use) {
+          await markTestLinkAsUsed(linkCode)
+        }
+
+        // Show thank you message
+        setShowResults(false)
+        setStep('results')
+      } catch (err) {
+        console.error('Error submitting assessment:', err)
+        setError('შეცდომა მონაცემების გაგზავნისას')
         setStep('error')
-        return
+      } finally {
+        setIsSubmitting(false);
       }
-
-      // Mark link as used if it's a single-use link
-      const { validateTestLink, markTestLinkAsUsed } = await import('../lib/api')
-      const testLink = await validateTestLink(linkCode)
-      if (testLink?.single_use) {
-        await markTestLinkAsUsed(linkCode)
-      }
-
-      // Show thank you message
-      setShowResults(false)
-      setStep('results')
     }
   }
 
@@ -367,9 +388,17 @@ export default function TestTaker({ linkCode }: TestTakerProps) {
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold transition-colors"
+                  disabled={isSubmitting}
+                  className={`w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold transition-colors flex items-center justify-center ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  {allowResultsDisplay ? 'შედეგების ნახვა' : 'კითხვებზე გადასვლა'}
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      იგზავნება...
+                    </>
+                  ) : (
+                    allowResultsDisplay ? 'შედეგების ნახვა' : 'კითხვებზე გადასვლა'
+                  )}
                 </button>
               </form>
             </div>
@@ -414,6 +443,8 @@ export default function TestTaker({ linkCode }: TestTakerProps) {
         onNext={handleNextQuestion}
         onPrevious={currentQuestionIndex === 0 ? handleBackToSelfAssessment : handlePreviousQuestion}
         onFinish={handleSubmitAssessment}
+        isSubmitting={isSubmitting}
+        finishButtonText={allowResultsDisplay ? 'შემდეგი' : 'დასრულება'}
       />
     )
   }
